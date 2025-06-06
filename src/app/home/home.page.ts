@@ -12,17 +12,30 @@ import { Router } from '@angular/router';
 })
 export class HomePage {
 
-  pokemon:any = {
-    nome: null,
-    poder: null
-  };
+  side_menu:any = [
+    {
+      icon:'home-outline',
+      name: 'Página Inicial',
+      selected: true
+    },
+    {
+      icon:'cube-outline',
+      name: 'Produtos',
+      selected: false
+    },
+    {
+      icon:'people-outline',
+      name: 'Clientes',
+      selected: true
+    },
+    {
+      icon:'call-outline',
+      name: 'Contato',
+      selected: true
+    },
+  ];
 
-  constructor( 
-    public crudService: CrudService
-  ){ }
-
-  enviar() {
-    this.crudService.insert(this.pokemon, 'pokemons');
   }
 
-}
+
+
