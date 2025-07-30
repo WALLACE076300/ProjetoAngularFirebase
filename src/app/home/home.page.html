@@ -1,6 +1,9 @@
 <ion-content [fullscreen]="true">
 
-    <ion-button color="secondary">Teste</ion-button>
+    <div *ngFor="let cliente of this.clientes">
+        <h1>{{ cliente.nome }}</h1>
+        <h1>{{ cliente.email }}</h1>
+    </div>
     
     
 </ion-content>
