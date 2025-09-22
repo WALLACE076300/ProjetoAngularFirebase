@@ -10,7 +10,15 @@ const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
+  },  {
+    path: 'perfil',
+    loadChildren: () => import('./perfil/perfil.module').then( m => m.PerfilPageModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   }
+
 ];
 
 @NgModule({
