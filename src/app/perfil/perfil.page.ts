@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../shared/api.service';
 
 interface Usuario {
-  name: ([users.name]);
-  email: ([users.email]);
+  name: string;
+  email: string;
   photoURL: string;
 }
 
@@ -22,8 +22,8 @@ interface Postagem {
 export class PerfilPage implements OnInit {
   usuario: Usuario = {
     photoURL: 'https://i.ytimg.com/vi/rwiT5FK5zJQ/maxresdefault.jpg',
-    name: '([users.name])',
-    email: '([users.email])'
+    name: 'triste',
+    email: 'triste@gmail.com'
   };
 
   defaultUserPhoto = 'https://www.gravatar.com/avatar?d=mp'; // Foto padrão
