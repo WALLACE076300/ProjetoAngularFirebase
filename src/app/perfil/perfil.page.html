@@ -1,13 +1,46 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>perfil</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="perfil-content">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">perfil</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Cabeçalho do perfil -->
+  <div class="perfil-header" *ngIf="usuario">
+    <img [src]="usuario.photoURL || defaultUserPhoto" alt="Foto do usuário" class="perfil-foto" />
+    <h2 class="perfil-nome">{{ usuario.name }}</h2>
+    <p class="perfil-email">{{ usuario.email }}</p>
+  </div>
+
+  <!-- Área de nova postagem -->
+  <div class="nova-postagem-container" *ngIf="usuario">
+    <ion-textarea
+      placeholder="O que você está pensando?"
+      [(ngModel)]="novaPostagem"
+      rows="3"
+      maxlength="255"
+      class="input-postagem"
+    ></ion-textarea>
+    <ion-button
+      expand="block"
+      color="primary"
+      (click)="fazerPostagem()"
+      [disabled]="!novaPostagem.trim()"
+    >
+      Postar
+    </ion-button>
+  </div>
+
+  <!-- Lista de postagens -->
+  <div class="postagens-container">
+    <div *ngFor="let post of postagens" class="postagem-card">
+      <div class="postagem-info">
+        <div class="postagem-usuario">
+          <img [src]="post.user?.photoURL || defaultUserPhoto" alt="Foto do usuário" class="postagem-foto-pequena" />
+          <div>
+            <p class="postagem-nome">{{ post.user?.name || 'Usuário' }}</p>
+            <p class="postagem-data">{{ post.created_at | date:'short' }}</p>
+          </div>
+        </div>
+        <p class="postagem-texto"  >{{ post.description }}</p>
+      
+      </div>
+    </div>
+  </div>
+
 </ion-content>

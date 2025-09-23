@@ -1,0 +1,96 @@
+.perfil-content {
+  --background: #00152a;
+  padding: 20px;
+}
+
+.perfil-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  .perfil-foto {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #3880ff;
+  }
+
+  .perfil-nome {
+    font-weight: 700;
+    font-size: 24px;
+    margin: 0;
+  }
+
+  .perfil-email {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+  }
+}
+
+.nova-postagem-container {
+  margin-bottom: 30px;
+
+  .input-postagem {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+
+  ion-button {
+    font-weight: 600;
+  }
+}
+
+.postagens-container {
+  .postagem-card {
+    background: #000000;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+
+    .postagem-info {
+      display: flex;
+      flex-direction: column;
+
+      .postagem-usuario {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+
+        .postagem-foto-pequena {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-right: 10px;
+          border: 2px solid #3880ff;
+        }
+
+        .postagem-nome {
+          font-weight: 700;
+          margin: 0;
+        }
+
+        .postagem-data {
+          font-size: 12px;
+          color: #999;
+          margin: 0;
+        }
+      }
+
+      .postagem-texto {
+        font-size: 16px;
+        color: #333;
+        white-space: pre-wrap;
+      }
+    }
+  }
+}

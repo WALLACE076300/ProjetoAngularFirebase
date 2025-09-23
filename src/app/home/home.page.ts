@@ -12,21 +12,36 @@ import { ApiService } from '../shared/api.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  usuario: any = {
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: ''
+  usuario: any = { name: '', email: '', password: '', password_confirmation: '' };
+
+  constructor(
+    public apiservice: ApiService,
+    private router: Router // <-- injetar aqui
+  ) { }
+
+  cadastrarUsuario() {
+    if (!this.usuario.name || !this.usuario.email || !this.usuario.password || !this.usuario.password_confirmation) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    if (this.usuario.password !== this.usuario.password_confirmation) {
+      alert('As senhas não coincidem.');
+      return;
+    }
+
+    this.apiservice.post('usuario/registrar-se', this.usuario).subscribe({
+      next: (resp) => {
+        alert('Cadastro realizado com sucesso!');
+        this.router.navigate(['/login']); // funciona agora
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Erro ao cadastrar. Verifique os dados.');
+      }
+    });
   }
-
-  constructor( 
-    public apiservice:ApiService
-  ){ }
-
-  cadastrarUsuario(){
-    this.apiservice.post('usuario/registrar-se', this.usuario).subscribe(resp => {
-      console.log(resp);
-    })
+  irParaLogin() {
+  this.router.navigate(['/login']);
   }
-
 }
