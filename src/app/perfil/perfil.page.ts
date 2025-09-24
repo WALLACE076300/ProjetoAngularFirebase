@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../shared/api.service';
-import { Storage } from '@ionic/storage-angular';
-import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-perfil',
@@ -10,193 +10,131 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./perfil.page.scss'],
 })
 export class PerfilPage implements OnInit {
-
-  usuario: any = null;
-  carregando: boolean = true;
-  editando: boolean = false;
-  arquivoFoto: File | null = null;
-  previewFoto: string | null = null;
-
-  novaPostagem: any = {
-    conteudo: '',
-    imagem: null,
-    previewImagem: null
-  };
+  usuario: any = { name: '', email: '', status: '', foto: '' };
+  novaSenha: string = '';
+  novaPostagem: string = '';
+  postagens: any[] = [];
 
   constructor(
-    public apiService: ApiService,
-    private storage:Storage,
-    private router: Router,
-    private alertController: AlertController
+    private apiService: ApiService,
+    private toastCtrl: ToastController,
+    private cdr: ChangeDetectorRef 
   ) {}
 
-  async ngOnInit() {
-    await this.carregarUsuario();
+  ngOnInit() {
+    this.carregarPerfil();
+    this.carregarPostagens();
   }
 
-  async carregarUsuario() {
-    const token = await this.storage.get('auth_token');
-    if (!token) {
-      this.router.navigate(['/home']);
-      return;
-    }
-
-    this.apiService.get('usuario/perfil').subscribe({
-      next: (resp) => {
+  // 🔹 Carregar perfil
+  carregarPerfil() {
+    this.apiService.getWithToken('usuario/perfil').subscribe({
+      next: (resp: any) => {
         this.usuario = resp;
-        if (!this.usuario.postagens) this.usuario.postagens = [];
-
-        // Atualiza cada postagem com URL completa automaticamente
-        this.usuario.postagens = this.usuario.postagens.map((post: any) => ({
-          ...post,
-          fotoUrl: this.getFotoPostagem(post.picture)
-        }));
-
-        // Foto de perfil
-        this.usuario.pictureUrl = this.getFotoPerfil(this.usuario.picture);
-
-        this.carregando = false;
+        // Use sempre a URL completa
+        const baseUrl = 'http://localhost:4200/perfil';
+        this.usuario.foto = `${baseUrl}${resp.picture}?t=${new Date().getTime()}`;
       },
-      error: (err) => {
-        console.error('Erro ao carregar perfil', err);
-        this.carregando = false;
-        this.mostrarErro('Erro ao carregar perfil');
-      }
+      error: (err: any) => {
+        console.error('Erro ao carregar perfil:', err);
+        this.mostrarToast('Erro ao carregar perfil', 'danger');
+      },
     });
   }
 
-  // ========== FOTO DE PERFIL ==========
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      this.arquivoFoto = file;
-      const reader = new FileReader();
-      reader.onload = (e: any) => this.previewFoto = e.target.result;
-      reader.readAsDataURL(file);
-    } else this.mostrarErro('Selecione apenas imagens válidas.');
-  }
-
-  uploadFoto(): void {
-  if (!this.arquivoFoto) { 
-    this.mostrarErro('Nenhuma imagem selecionada.');
-    return; // aqui só sai da função, não retorna valor
-  }
-
-  const formData = new FormData();
-  formData.append('picture', this.arquivoFoto);
-
-  this.apiService.post('usuario/foto-upload', formData).subscribe({
-    next: (resp: any) => {
-      this.usuario.picture = resp.picture_url;
-      this.usuario.pictureUrl = this.getFotoPerfil(resp.picture_url);
-      this.arquivoFoto = null;
-      this.previewFoto = null;
-      this.mostrarSucesso('Foto de perfil atualizada!');
-    },
-    error: (err) => {
-      console.error(err);
-      this.mostrarErro('Erro ao atualizar foto');
-    }
-  });
-}
-
-
-  toggleEdicao() { this.editando = !this.editando; }
-salvarPerfil(): void {
-  if (!this.usuario.name || !this.usuario.email) { 
-    this.mostrarErro('Nome e e-mail são obrigatórios');
-    return;
-  }
-
-  this.apiService.post('usuario/editar', this.usuario).subscribe({
-    next: () => { this.editando = false; this.mostrarSucesso('Perfil atualizado!'); },
-    error: (err) => { console.error(err); this.mostrarErro('Erro ao salvar perfil'); }
-  });
-}
-
-
-  // ========== POSTAGENS ==========
-  onImagemPostagemSelecionada(event: any) {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      this.novaPostagem.imagem = file;
-      const reader = new FileReader();
-      reader.onload = (e: any) => this.novaPostagem.previewImagem = e.target.result;
-      reader.readAsDataURL(file);
-    } else this.mostrarErro('Selecione uma imagem válida.');
-  }
-
-  criarPostagem(): void {
-  const { conteudo, imagem } = this.novaPostagem;
-  if (!conteudo) { 
-    this.mostrarErro('Conteúdo é obrigatório.');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('description', conteudo);
-  if (imagem) formData.append('picture', imagem);
-
-  this.apiService.post('usuario/postagens', formData).subscribe({
-    next: (resp: any) => {
-      resp.fotoUrl = this.getFotoPostagem(resp.picture);
-      this.usuario.postagens.unshift(resp);
-      this.novaPostagem = { conteudo: '', imagem: null, previewImagem: null };
-      this.mostrarSucesso('Postagem publicada!');
-    },
-    error: (err) => { console.error(err); this.mostrarErro('Erro ao publicar postagem'); }
-  });
-}
-
-
-  // ========== FUNÇÕES AUTOMÁTICAS DE URL ==========
-  getFotoPerfil(caminho: string | null): string {
-    if (!caminho) return 'assets/default-avatar.png';
-    if (caminho.startsWith('http')) return caminho;
-    return `http://127.0.0.1:8000/storage/${caminho.replace(/^\/+/, '')}`;
-  }
-
-  getFotoPostagem(caminho: string | null): string {
-    if (!caminho) return '';
-    if (caminho.startsWith('http')) return caminho;
-
-    // Detecta automaticamente se está em "postagens" ou "pictures"
-    const base = 'http://127.0.0.1:8000/storage/';
-    if (caminho.includes('postagens') || caminho.includes('pictures')) {
-      return `${base}${caminho.replace(/^\/+/, '')}`;
-    }
-
-    // Caso só tenha o nome do arquivo
-    return `${base}postagens/${caminho}`;
-  }
-
-  // ========== ALERTAS ==========
-  private async mostrarErro(mensagem: string) {
-    const alert = await this.alertController.create({ header: 'Erro', message: mensagem, buttons: ['OK'] });
-    await alert.present();
-  }
-
-  private async mostrarSucesso(mensagem: string) {
-    const alert = await this.alertController.create({ header: 'Sucesso', message: mensagem, buttons: ['OK'] });
-    await alert.present();
-  }
-
-  // ========== LOGOUT ==========
-  async logout() {
-    await this.alertController.create({
-      header: 'Sair',
-      message: 'Deseja realmente sair?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Sair', handler: () => this.realizarLogout() }
-      ]
-    }).then(a => a.present());
-  }
-
-  private realizarLogout() {
-    this.apiService.post('usuario/logout', {}).subscribe({
-      next: async () => { await this.storage.clear(); this.router.navigate(['/home']); },
-      error: async () => { await this.storage.clear(); this.router.navigate(['/home']); }
+  // 🔹 Atualizar perfil
+  atualizarPerfil() {
+    this.apiService.postWithToken('usuario/editar', this.usuario).subscribe({
+      next: () => this.mostrarToast('Perfil atualizado com sucesso!', 'success'),
+      error: (err: any) => {
+        console.error('Erro ao atualizar perfil:', err);
+        this.mostrarToast('Erro ao atualizar perfil', 'danger');
+      },
     });
+  }
+
+  // 🔹 Alterar senha
+  mudarSenha() {
+    if (!this.novaSenha.trim()) return;
+
+    const dados = { password: this.novaSenha, password_confirmation: this.novaSenha };
+
+    this.apiService.postWithToken('usuario/editar', dados).subscribe({
+      next: () => {
+        this.novaSenha = '';
+        this.mostrarToast('Senha alterada com sucesso!', 'success');
+      },
+      error: (err: any) => {
+        console.error('Erro ao alterar senha:', err);
+        this.mostrarToast('Erro ao alterar senha', 'danger');
+      },
+    });
+  }
+
+  // 🔹 Upload de foto
+  uploadFoto(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('picture', file);
+
+    this.apiService.postWithToken('usuario/foto-upload', formData).subscribe({
+  next: (resp: any) => {
+    this.usuario.foto = resp.picture_url || this.usuario.foto;
+    this.cdr.detectChanges(); // 🔄 força atualização da view
+    this.mostrarToast('Foto atualizada com sucesso!', 'success');
+  },
+  error: (err: any) => {
+    console.error('Erro ao enviar foto:', err);
+    this.mostrarToast('Erro ao atualizar foto', 'danger');
+  },
+
+    });
+  }
+
+  // 🔹 Carregar postagens
+  carregarPostagens() {
+    this.apiService.getWithToken('postagens').subscribe({
+      next: (resp: any) => this.postagens = resp,
+      error: (err: any) => {
+        console.error('Erro ao carregar postagens:', err);
+        this.mostrarToast('Erro ao carregar postagens', 'danger');
+      },
+    });
+  }
+
+  // 🔹 Criar postagem
+  criarPostagem() {
+    if (!this.novaPostagem.trim()) return;
+
+    this.apiService.postWithToken('postagens', { conteudo: this.novaPostagem }).subscribe({
+      next: () => {
+        this.novaPostagem = '';
+        this.carregarPostagens();
+        this.mostrarToast('Postagem criada!', 'success');
+      },
+      error: (err: any) => {
+        console.error('Erro ao criar postagem:', err);
+        this.mostrarToast('Erro ao criar postagem', 'danger');
+      },
+    });
+  }
+
+  // 🔹 Toast auxiliar
+  private async mostrarToast(mensagem: string, cor: 'success' | 'danger') {
+    const toast = await this.toastCtrl.create({
+      message: mensagem,
+      duration: 3000,
+      color: cor,
+    });
+    toast.present();
+  }
+  logout() {
+    // Remove o token do localStorage
+    localStorage.removeItem('token');
+
+    // Redireciona para a página de login
+    window.location.href = '/login';
   }
 }

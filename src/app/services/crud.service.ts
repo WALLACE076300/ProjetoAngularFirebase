@@ -1,7 +1,7 @@
 import { orderBy } from '@firebase/firestore';
 import { Injectable } from '@angular/core';
 import { addDoc, getDocs, doc, updateDoc, collection, Firestore, deleteDoc, query, where, WhereFilterOp, startAt, endAt } from '@angular/fire/firestore';
-import { AuthInterceptor } from 'src/app/services/auth.service';
+import { AuthenticateService } from 'src/app/services/auth.service';
 import { MessageService } from 'src/app/services/message.service';
 import { AlertController } from '@ionic/angular';
 
@@ -17,7 +17,7 @@ export class CrudService {
     constructor(
         public firestore: Firestore,
         private _message: MessageService,
-        private _auth: AuthInterceptor,
+        private _auth: AuthenticateService,
         private _alertController: AlertController
     ) {}
 

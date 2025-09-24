@@ -1,47 +1,53 @@
 import { Component } from '@angular/core';
-import { AuthenticateService } from '../services/auth.service';
-import { CrudService } from '../services/crud.service';
-import { Storage, getDownloadURL, ref, uploadBytesResumable } from '@angular/fire/storage';
-import { MessageService } from '../services/message.service';
 import { Router } from '@angular/router';
-import { ApiService } from '../shared/api.service';
+import { HttpClient } from '@angular/common/http';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
-  usuario: any = { name: '', email: '', password: '', password_confirmation: '' };
+  usuario = {
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: ''
+  };
+
+  private apiUrl = 'http://127.0.0.1:8000/api/usuario'; // base da API Laravel
 
   constructor(
-    public apiservice: ApiService,
-    private router: Router // <-- injetar aqui
-  ) { }
+    private router: Router,
+    private http: HttpClient,
+    private toastCtrl: ToastController
+  ) {}
 
-  cadastrarUsuario() {
-    if (!this.usuario.name || !this.usuario.email || !this.usuario.password || !this.usuario.password_confirmation) {
-      alert('Por favor, preencha todos os campos.');
-      return;
-    }
+  async cadastrarUsuario() {
+    this.http.post(`${this.apiUrl}/registrar-se`, this.usuario).subscribe({
+      next: async (res: any) => {
+        const toast = await this.toastCtrl.create({
+          message: 'Usuário cadastrado com sucesso!',
+          duration: 2000,
+          color: 'success'
+        });
+        toast.present();
 
-    if (this.usuario.password !== this.usuario.password_confirmation) {
-      alert('As senhas não coincidem.');
-      return;
-    }
-
-    this.apiservice.post('usuario/registrar-se', this.usuario).subscribe({
-      next: (resp) => {
-        alert('Cadastro realizado com sucesso!');
-        this.router.navigate(['/login']); // funciona agora
+        this.router.navigate(['/login']); // após cadastro, vai para o login
       },
-      error: (err) => {
-        console.error(err);
-        alert('Erro ao cadastrar. Verifique os dados.');
+      error: async (err) => {
+        const toast = await this.toastCtrl.create({
+          message: err.error?.message || 'Erro ao cadastrar usuário',
+          duration: 2000,
+          color: 'danger'
+        });
+        toast.present();
       }
     });
   }
+
   irParaLogin() {
-  this.router.navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 }

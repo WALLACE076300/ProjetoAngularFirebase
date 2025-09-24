@@ -1,44 +1,29 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
 
-  <ion-row class="ion-justify-content-center ion-align-items-center" style="padding: 20px;">
+  <ion-row class="ion-justify-content-center">
+    <ion-col size="6">
 
-    <ion-col size="12" size-md="8" size-lg="6">
+      <ion-item>
+        <ion-input type="email" label="E-mail" [(ngModel)]="credenciais.email"></ion-input>
+      </ion-item>
 
-      <!-- Título -->
-      <div class="form-header">
-        <h2>Login</h2>
+      <ion-item>
+        <ion-input type="password" label="Senha" [(ngModel)]="credenciais.password"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-button expand="block" (click)="loginUsuario()">Entrar</ion-button>
+      </ion-item>
+
+      <div *ngIf="mensagem" class="ion-text-center ion-margin-top">
+        <ion-text color="danger">{{ mensagem }}</ion-text>
       </div>
 
-      <div class="form-container">
-        <!-- E-mail -->
-        <ion-item>
-          <ion-label position="floating">E-mail</ion-label>
-          <ion-input type="email" [(ngModel)]="usuario.email"></ion-input>
-        </ion-item>
-
-        <!-- Senha -->
-        <ion-item>
-          <ion-label position="floating">Senha</ion-label>
-          <ion-input type="password" [(ngModel)]="usuario.password"></ion-input>
-        </ion-item>
-
-        <!-- Botão Entrar -->
-        <ion-item>
-          <ion-button expand="full" color="primary" (click)="irParaPerfil()">
-            Entrar
-          </ion-button>
-        </ion-item>
-
-        <!-- Link para cadastro -->
-        <ion-item lines="none" class="ion-justify-content-center" style="margin-top: 10px;">
-            <ion-button expand="block" color="medium" (click)="irParaCadastro()">
-                Não tem conta? Cadastrar-se
-            </ion-button>
-        </ion-item>
-      </div>
+      <ion-button fill="clear" (click)="irParaCadastro()">
+        Não tem cadastro? Cadastre-se
+      </ion-button>
 
     </ion-col>
-
   </ion-row>
 
 </ion-content>

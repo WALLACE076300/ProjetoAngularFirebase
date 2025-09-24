@@ -1,63 +1,56 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ApiService {
-  isLoading: boolean = false;
-  handlerMessage = '';
-  roleMessage = '';
 
-  constructor(private http: HttpClient) {}
+  private baseUrl = 'http://127.0.0.1:8000/api/';
 
-  URL = 'http://127.0.0.1:8000/api';
-    
-  /**
-   * Método POST genérico
-   */
-  post(endpoint: string, data: any): Observable<any> {
-    // Se data for FormData, NÃO adicione headers de Content-Type
-    if (data instanceof FormData) {
-      return this.http.post(`${this.URL}/${endpoint}`, data);
-    }
-    
-    // Para dados JSON, adicione os headers normalmente
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+  constructor(private http: HttpClient) { }
+
+  // 🔹 Pega o token automaticamente do localStorage
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
     });
-
-    return this.http.post(`${this.URL}/${endpoint}`, data, { headers });
   }
 
-  getFotoUrl(caminho: string | null): string {
-  if (!caminho) return 'assets/default-avatar.png';
-  if (caminho.startsWith('http')) return caminho;
-  return `http://127.0.0.1:8000/storage/${caminho}`;
+  // 🔹 Requisições sem autenticação
+  get(endpoint: string): Observable<any> {
+    return this.http.get(this.baseUrl + endpoint);
+  }
+
+  post(endpoint: string, data: any): Observable<any> {
+    return this.http.post(this.baseUrl + endpoint, data);
+  }
+
+  // 🔹 Requisições com autenticação
+  getWithToken(endpoint: string): Observable<any> {
+    return this.http.get(this.baseUrl + endpoint, { headers: this.getAuthHeaders() });
+  }
+
+  putWithToken(endpoint: string, data: any): Observable<any> {
+    return this.http.put(this.baseUrl + endpoint, data, { headers: this.getAuthHeaders() });
+  }
+
+  deleteWithToken(endpoint: string): Observable<any> {
+    return this.http.delete(this.baseUrl + endpoint, { headers: this.getAuthHeaders() });
+  }
+
+  postWithToken(endpoint: string, data: any): Observable<any> {
+  const headers = this.getAuthHeaders();
+
+  // Se for FormData, não define Content-Type (Angular faz automaticamente)
+  if (data instanceof FormData) {
+    return this.http.post(`${this.baseUrl}${endpoint}`, data, { headers });
+  }
+
+  // Para JSON
+  return this.http.post(`${this.baseUrl}${endpoint}`, data, { headers: headers.set('Content-Type', 'application/json') });
 }
 
-
-  put(endpoint: string, data: any): Observable<any> {
-    // Mesma lógica para PUT
-    if (data instanceof FormData) {
-      return this.http.put(`${this.URL}/${endpoint}`, data);
-    }
-    
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
-
-    return this.http.put(`${this.URL}/${endpoint}`, data, { headers });
-  }
-
-  delete(endpoint: string): Observable<any> {
-    return this.http.delete(`${this.URL}/${endpoint}`);
-  }
-
-  get(endpoint: string): Observable<any> {
-    return this.http.get(`${this.URL}/${endpoint}`);
-  }
 }

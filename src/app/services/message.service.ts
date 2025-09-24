@@ -17,4 +17,4 @@ export class MessageService {
             duration: duration
         }).then(toast => toast.present());
     }
-}
+}   

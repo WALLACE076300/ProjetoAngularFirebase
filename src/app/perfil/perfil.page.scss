@@ -1,26 +1,254 @@
+/* Container principal */
+.perfil-container {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border-radius: 15px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Container da foto */
 .foto-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
 }
 
-.foto-perfil {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
+/* Foto de perfil */
+.perfil-foto {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 3px solid #3880ff;
-  margin-bottom: 10px;
-}
-
-ion-card img {
-  width: 100%;
-  height: auto;
+  border: 4px solid white;
   object-fit: cover;
-  border-bottom: 1px solid #ccc;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
 }
 
+.perfil-foto:hover {
+  transform: scale(1.05);
+}
+
+/* Botão da câmera */
+.camera-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: #007bff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 3px solid white;
+  transition: all 0.3s ease;
+}
+
+.camera-btn:hover {
+  background: #0056b3;
+  transform: scale(1.1);
+}
+
+.camera-icon {
+  font-size: 1.2rem;
+  color: white;
+}
+
+/* Informações do usuário */
+.usuario-nome {
+  margin: 0.5rem 0 0.2rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.usuario-email {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  color: white;
+}
+
+/* Listas e itens */
+ion-list {
+  background: transparent;
+  margin-bottom: 1.5rem;
+}
+
+ion-item {
+  --background: #ffffff;
+  --border-radius: 10px;
+  margin-bottom: 1rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --inner-padding-end: 0;
+  transition: all 0.3s ease;
+}
+
+ion-item:hover {
+  --background: #a1d3ff;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+/* Botões principais */
+ion-button {
+  margin: 1rem 0;
+  --border-radius: 10px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: none;
+  height: 50px;
+}
+
+ion-button:hover {
+  --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Botão de sair */
+ion-button[color="danger"] {
+  margin-bottom: 2rem;
+  --background: #000000;
+  --background-hover: #333333;
+}
+
+/* Card de nova postagem */
 ion-card {
-  margin-bottom: 16px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+  border: 1px solid #000000;
+  background: #ffffff;
+}
+
+ion-card-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border-radius: 15px 15px 0 0;
+  padding: 1rem;
+}
+
+ion-card-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: white;
+}
+
+ion-card-content {
+  padding: 1.5rem;
+  background: #ffffff;
+}
+
+/* Textarea da postagem */
+ion-textarea {
+  --background: #ffffff;
+  --border-radius: 10px;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  border: 1px solid #000000;
+  color: #000000;
+}
+
+/* Lista de postagens */
+ion-list:last-of-type {
+  margin-top: 2rem;
+}
+
+ion-item:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Estilo para cada postagem */
+ion-item h3 {
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0.3rem;
+}
+
+ion-item p {
+  color: #333333;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+ion-item small {
+  color: #666666;
+  font-size: 0.8rem;
+}
+
+/* Efeitos de foco nos inputs */
+ion-input, ion-textarea {
+  --highlight-color-focused: #007bff;
+  color: #000000;
+}
+
+ion-label {
+  color: #000000 !important;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .perfil-container {
+    margin: 1rem 0;
+    padding: 1.5rem 1rem;
+  }
+  
+  .perfil-foto {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .camera-btn {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .usuario-nome {
+    font-size: 1.3rem;
+  }
+  
+  ion-card {
+    margin: 1rem 0;
+  }
+}
+
+/* Animações suaves */
+ion-content {
+  --background: #ffffff;
+}
+
+/* Loading state para os botões */
+ion-button:disabled {
+  opacity: 0.6;
+  transform: none !important;
+}
+
+/* Estilo para o header */
+ion-toolbar {
+  --background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  --color: white;
+}
+
+ion-title {
+  font-weight: 600;
+  color: white;
+}
+
+/* Garantir que o texto nos inputs seja preto */
+ion-input {
+  color: #000000;
+}
+
+/* Placeholder com cor mais clara */
+ion-input::placeholder, ion-textarea::placeholder {
+  color: #666666;
 }
